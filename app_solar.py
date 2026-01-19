@@ -1,59 +1,56 @@
 import streamlit as st
+import pandas as pd
 import urllib.parse
 
-# Configuración básica
-st.set_page_config(page_title="Asesor Solar Modular", layout="centered")
+# Configuración de la página
+st.set_page_config(page_title="Calculadora Solar Pro", page_icon="☀️")
 
-st.title("☀️ Calculadora Solar Modular")
-st.write("Selecciona tus equipos para diseñar tu sistema a medida.")
+st.title("☀️ Estimador de Consumo Solar")
+st.write("Modifica la tabla con tus artefactos. Puedes cambiar los Watts, las horas o agregar nuevos aparatos al final.")
 
-# --- DATOS DE EQUIPOS ---
-equipos = [
-    {"nombre": "Refrigerador", "w": 250, "h": 24},
-    {"nombre": "Iluminación LED", "w": 100, "h": 5},
-    {"nombre": "Televisor", "w": 120, "h": 4},
-    {"nombre": "Módem Wi-Fi", "w": 20, "h": 24},
-    {"nombre": "Lavarropas", "w": 500, "h": 1},
-    {"nombre": "Aire Acondicionado", "w": 1500, "h": 5}
-]
+# 1. Definimos la lista base
+datos_base = {
+    "Aparato": ["Heladera", "Lavarropas", "Aire Acondicionado", "Televisor", "Microondas", "Pava eléctrica", "Iluminación LED"],
+    "Watts": [150, 500, 1350, 100, 1200, 2000, 150],
+    "Cantidad": [1, 0, 0, 1, 0, 0, 10],
+    "Horas_Uso": [24, 1, 5, 4, 0.2, 0.2, 5]
+}
 
-# --- LÓGICA DE LA APP ---
-objetivo = st.radio("¿Cuál es tu prioridad?", ["Ahorrar Energía", "Tener Backup", "Ambos"])
+# 2. Tabla Interactiva
+df_usuario = pd.DataFrame(datos_base)
+tabla_editable = st.data_editor(
+    df_usuario, 
+    num_rows="dynamic", 
+    use_container_width=True
+)
 
-st.subheader("Selecciona tus dispositivos:")
-seleccionados = []
-for e in equipos:
-    if st.checkbox(f"{e['nombre']} ({e['w']}W)"):
-        seleccionados.append(e)
+# 3. Cálculos
+tabla_editable["Total_Dia_Wh"] = tabla_editable["Watts"] * tabla_editable["Cantidad"] * tabla_editable["Horas_Uso"]
+total_kwh_dia = tabla_editable["Total_Dia_Wh"].sum() / 1000
 
-if seleccionados:
-    total_w = sum(item['w'] for item in seleccionados)
-    total_kwh = sum(item['w'] * item['h'] for item in seleccionados) / 1000
-    
-    st.divider()
-    st.markdown(f"### 📊 Resumen de Consumo")
-    st.write(f"**Potencia Pico:** {total_w} W")
-    st.write(f"**Consumo Diario:** {total_kwh:.2f} kWh/día")
+st.metric("Consumo Total Estimado", f"{total_kwh_dia:.2f} kWh/día")
 
-    if "Ahorrar" in objetivo:
-        st.info("💡 Puedes empezar sin baterías e instalarlas después.")
-    elif "Backup" in objetivo:
-        st.warning("🔋 Puedes empezar con baterías y añadir paneles después.")
-
-    import streamlit as st
-import urllib.parse
-
-# --- AQUÍ DEBES PONER TU NÚMERO ---
-# Ejemplo: "5491161549018" (Sin el +, sin espacios, con código de país)
-mi_numero = "TU_NUMERO_AQUI" 
-
+# 4. Lógica de WhatsApp personalizada
 st.markdown("---")
-st.subheader("📲 ¿Listo para avanzar?")
+st.subheader("📩 ¿Quieres un presupuesto detallado?")
 
-# Creamos el link de WhatsApp
-texto_mensaje = "Hola, quiero recibir asesoramiento sobre mi consumo solar estimado."
-texto_codificado = urllib.parse.quote(texto_mensaje)
-url_final = f"https://wa.me/{mi_numero}?text={texto_codificado}"
+# --- PON TU NÚMERO AQUÍ ---
+mi_telefono = "5491161549018" # Reemplaza con tu número real
 
-# Este botón sí funciona en la nube
-st.link_button("Contactar por WhatsApp", url_final)
+# Creamos un resumen de texto de la tabla para el mensaje
+resumen_aparatos = ""
+for index, row in tabla_editable.iterrows():
+    if row["Cantidad"] > 0:
+        resumen_aparatos += f"- {row['Aparato']}: {row['Cantidad']} unidad(es)\n"
+
+mensaje_wa = (
+    f"Hola! He usado tu calculadora solar.\n\n"
+    f"📍 *Resumen de consumo:* {total_kwh_dia:.2f} kWh/día\n"
+    f"📍 *Detalle de equipos:*\n{resumen_aparatos}\n"
+    f"¿Podrías enviarme un presupuesto para cubrir este consumo?"
+)
+
+mensaje_codificado = urllib.parse.quote(mensaje_wa)
+url_whatsapp = f"https://wa.me/{mi_telefono}?text={mensaje_codificado}"
+
+st.link_button("🚀 Enviar detalle por WhatsApp", url_whatsapp)
