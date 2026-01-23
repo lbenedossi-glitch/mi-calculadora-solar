@@ -17,8 +17,8 @@ data_enre = {
 df = pd.DataFrame(data_enre)
 
 # --- BLOQUE COMERCIAL DE INICIO ---
-st.title("⚡ ¿Problemas con cortes de energía?")
-st.subheader("Nosotros podemos ayudarte.")
+st.title("⚡ SESTRI ENERGIA")
+st.subheader("¿Problemas por cortes de luz o alto costo en la factura?. Nosotros podemos ayudarte.")
 st.write("Dejanos saber tus necesidades enviándonos la info con unos simples clics.")
 
 st.markdown("---")
@@ -76,5 +76,6 @@ if seleccionados:
 
 else:
     st.info("Elegí tus artefactos arriba para calcular la potencia total.")
+
 
 
