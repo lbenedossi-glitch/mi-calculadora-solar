@@ -60,7 +60,7 @@ if seleccionados:
             if nombre and seleccionados:
                 # --- CONFIGURACIÓN DE WHATSAPP ---
                 # AQUÍ: Poné tu número (ej: 5491161234567) sin símbolos
-                tu_telefono = "541161549018" 
+                tu_telefono = "5491161549018" 
                 
                 lista_txt = ", ".join(seleccionados)
                 mensaje_wa = f"Hola Sestri Energía! Mi nombre es {nombre}. Mi relevamiento dio un total de {total_kw:.2f} kW. Equipos: {lista_txt}."
@@ -76,4 +76,5 @@ if seleccionados:
 
 else:
     st.info("Elegí tus artefactos arriba para calcular la potencia total.")
+
 
