@@ -1,3 +1,4 @@
+import streamlit as st
 import pandas as pd
 
 st.set_page_config(page_title="Sestri Energía - Relevamiento Completo", layout="centered")
@@ -78,7 +79,7 @@ if total_watts > 0:
         
         if st.form_submit_button("PREPARAR MENSAJE PARA WHATSAPP", use_container_width=True):
             if nombre and tel_cliente:
-                tu_num = "5491100000000" # <-- CAMBIAR POR EL TUYO
+                tu_num = "5491161549018" # <-- CAMBIAR POR EL TUYO
                 msg = (f"Hola Sestri Energía! Soy {nombre} ({tel_cliente}). "
                        f"Busco: {objetivo}. Potencia: {total_kw:.2f}kW. "
                        f"Equipos: {', '.join(equipos_finales)}.")
