@@ -1,88 +1,43 @@
 import streamlit as st
-import pandas as pd
-import urllib.parse
 
-# 1. Configuración de página
-st.set_page_config(page_title="Sestri Energía - Estimador Solar", page_icon="💡")
+# Mantenemos el diseño centrado para que no se desborde en el móvil
+st.set_page_config(page_title="Relevamiento GST", layout="centered")
 
-# Estilo para fondo y colores
-st.markdown("""
-    <style>
-    .stApp {
-        background-color: #fdfcf0;
-    }
-    .st-emotion-cache-1kyx0t0 {
-        background-color: #ffffff;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    </style>
-    """, unsafe_allow_html=True)
+st.title("☀️ Relevamiento de Consumos Críticos")
+st.write("Complete los equipos que desea mantener funcionando ante un corte o con energía solar.")
 
-# 2. Encabezado de la Empresa
-st.write("### SESTRI ENERGÍA")
-st.title("☀️ Estimador Solar Inteligente")
+with st.form("relevamiento_tecnico"):
+    st.subheader("Equipos de Respaldo")
+    
+    # Lista de equipos comunes para que el cliente solo complete horas o Watts
+    # Usamos columnas que se apilan solas en el celular
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        st.write("**Dispositivo Crítico**")
+        eq1 = st.checkbox("Heladera / Freezer")
+        eq2 = st.checkbox("Iluminación (LED)")
+        eq3 = st.checkbox("Bomba de Agua")
+        eq4 = st.checkbox("Internet / Cámaras")
+        otro_nombre = st.text_input("Otro equipo:")
+    
+    with col2:
+        st.write("**Uso (Horas/Día)**")
+        h1 = st.number_input("Horas Heladera", min_value=0, max_value=24, step=1, label_visibility="collapsed")
+        h2 = st.number_input("Horas Luces", min_value=0, max_value=24, step=1, label_visibility="collapsed")
+        h3 = st.number_input("Horas Bomba", min_value=0, max_value=24, step=1, label_visibility="collapsed")
+        h4 = st.number_input("Horas Internet", min_value=0, max_value=24, step=1, label_visibility="collapsed")
+        h5 = st.number_input("Horas Otro", min_value=0, max_value=24, step=1, label_visibility="collapsed")
 
-st.info("""
-**¿Problemas con el suministro eléctrico?** Los sistemas de generación fotovoltaicos reducen tu dependencia del mismo para mantener un grado de confort.
-""")
+    st.divider()
+    
+    # Datos de contacto para que te llegue el informe
+    nombre = st.text_input("Tu Nombre")
+    telefono = st.text_input("WhatsApp de contacto")
 
-st.markdown("---")
+    # Botón de envío que ocupa todo el ancho del celular
+    enviar = st.form_submit_button("Enviar datos para configuración", use_container_width=True)
 
-# 3. Objetivos
-st.subheader("1. ¿Cuál es su objetivo principal?")
-objetivo = st.radio(
-    "Seleccione una opción:",
-    ["Ahorro de energía (Reducir factura)", "Backup (Protección ante cortes)", "Ambos (Ahorro + Respaldo)"],
-    index=0
-)
-
-# 4. Sección de la Tabla
-st.markdown("---")
-st.subheader("2. Detalle de sus consumos")
-st.write("Ajuste los valores o agregue aparatos nuevos al final:")
-
-datos_base = {
-    "Aparato": ["Heladera", "Lavarropas", "Aire Acondicionado", "Televisor", "Iluminación LED", "Pava eléctrica"],
-    "Watts": [150, 500, 1350, 100, 150, 2000],
-    "Cantidad": [1, 0, 0, 1, 10, 0],
-    "Horas_Uso": [24, 1, 5, 4, 5, 0.2]
-}
-
-df_usuario = pd.DataFrame(datos_base)
-tabla_editable = st.data_editor(
-    df_usuario, 
-    num_rows="dynamic", 
-    use_container_width=True
-)
-
-# 5. Cálculos
-tabla_editable["Total_Dia_Wh"] = tabla_editable["Watts"] * tabla_editable["Cantidad"] * tabla_editable["Horas_Uso"]
-total_kwh_dia = tabla_editable["Total_Dia_Wh"].sum() / 1000
-
-st.success(f"### Consumo Estimado: {total_kwh_dia:.2f} kWh/día")
-
-# 6. Botón de WhatsApp personalizado
-st.markdown("---")
-st.write("#### 💡 ¿Tienes dudas?")
-
-# --- REEMPLAZA CON TU NÚMERO ---
-mi_telefono = "5491161549018" 
-
-resumen_aparatos = ""
-for index, row in tabla_editable.iterrows():
-    if row["Cantidad"] > 0:
-        resumen_aparatos += f"- {row['Aparato']}: {row['Cantidad']} unidad(es)\n"
-
-mensaje_wa = (
-    f"Hola Sestri Energía! He usado su estimador solar.\n\n"
-    f"🎯 Objetivo: {objetivo}\n"
-    f"📊 Consumo: {total_kwh_dia:.2f} kWh/día\n\n"
-    f"📋 Detalle:\n{resumen_aparatos}"
-)
-
-mensaje_codificado = urllib.parse.quote(mensaje_wa)
-url_whatsapp = f"https://wa.me/{mi_telefono}?text={mensaje_codificado}"
-
-st.link_button("💡 Consultanos sin compromiso por WhatsApp", url_whatsapp, type="primary", use_container_width=True)
+if enviar:
+    st.success(f"¡Gracias {nombre}! Recibimos tus datos. En breve configuraremos tu sistema a medida.")
+    # Aquí podrías agregar el botón de WhatsApp que ya teníamos para que te mande el resumen
