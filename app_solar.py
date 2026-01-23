@@ -1,24 +1,21 @@
 import streamlit as st
 import pandas as pd
 
-# Configuración Sestri Energía
-st.set_page_config(page_title="Sestri Energía - Relevamiento Profesional", layout="centered")
+st.set_page_config(page_title="Sestri Energía - Relevamiento", layout="centered")
 
-# --- CARGA DE DATOS DESDE TU EXCEL ---
-# He mapeado los datos directamente de tu archivo "Consumo Estimado Total y Máximo.xlsx"
+# --- BASE DE DATOS DE TU EXCEL (ENRE) ---
 data_enre = {
     "Artefacto": [
-        "Aire acondicionado de 2200 frigorías F/C", "Aire acondicionado de 3500 frigorías F/C", 
-        "Bomba de agua de 1/2 HP", "Bomba de agua 1 HP", "Freezer", "Heladera con freezer", 
-        "Lavarropas automático de 5 kg", "Microondas", "Televisor LED 32'' a 50''", "Pava eléctrica",
-        "Termotanque eléctrico", "Ventilador de techo", "Iluminación LED (11 W)"
+        "Aire acondicionado 2200 frigorías", "Aire acondicionado 3500 frigorías", 
+        "Bomba de agua 1/2 HP", "Bomba de agua 1 HP", "Freezer", "Heladera con freezer", 
+        "Lavarropas automático", "Microondas", "Televisor LED 32-50''", "Pava eléctrica",
+        "Termotanque eléctrico", "Ventilador de techo", "Iluminación LED (Kit 10u)"
     ],
-    "Potencia": [1013, 1613, 380, 760, 150, 200, 175, 640, 90, 2000, 1500, 60, 11]
+    "Potencia": [1013, 1613, 380, 760, 150, 200, 175, 640, 90, 2000, 1500, 60, 110]
 }
-# Nota: En la versión final, usaremos pd.read_csv o la API de Google para leer el total de las 50+ filas.
 df = pd.DataFrame(data_enre)
 
-# --- INTERFAZ ---
+# --- INICIO DE APP ---
 st.title("⚡ ¿Problemas con cortes de energía?")
 st.subheader("Nosotros podemos ayudarte.")
 st.write("Dejanos saber tus necesidades enviándonos la info con un simple clic. **Somos Sestri Energía.**")
@@ -26,56 +23,62 @@ st.write("Dejanos saber tus necesidades enviándonos la info con un simple clic.
 st.markdown("---")
 
 with st.form("relevamiento_sestri"):
-    # 1. OBJETIVO
-    st.subheader("1. ¿Qué buscás resolver?")
-    objetivo = st.radio("Prioridad:", ["Back-Up (Cortes)", "Ahorro", "Ambas"], index=0)
+    st.subheader("1. Prioridad")
+    objetivo = st.radio("¿Qué buscás resolver?", ["Back-Up (Cortes)", "Ahorro", "Ambas"], horizontal=True)
     
     st.divider()
 
-    # 2. CONSUMOS (Usando tu lista del ENRE)
     st.subheader("2. Consumos Críticos")
-    st.write("Buscá y seleccioná los equipos que querés mantener encendidos:")
-    
     seleccionados = st.multiselect(
-        "Seleccionar artefactos:",
+        "Buscá y seleccioná tus artefactos:",
         options=df["Artefacto"].tolist(),
-        default=["Heladera con freezer", "Iluminación LED (11 W)"]
+        default=["Heladera con freezer"]
     )
     
     total_wh_dia = 0
     
     if seleccionados:
-        col1, col2, col3 = st.columns([2, 1, 1])
-        with col1: st.caption("**Artefacto**")
-        with col2: st.caption("**Watts (ENRE)**")
-        with col3: st.caption("**Horas/Día**")
-        
-        for art in seleccionados:
-            potencia = int(df[df["Artefacto"] == art]["Potencia"].iloc[0])
-            
-            c1, c2, c3 = st.columns([2, 1, 1])
-            with c1: st.write(art)
-            with c2: st.write(f"{potencia} W")
-            with c3:
-                h = st.number_input(f"H_{art}", min_value=0, max_value=24, step=1, label_visibility="collapsed")
-            
-            total_wh_dia += (potencia * h)
+        st.write("---")
+        # Encabezados de columna
+        c_tit1, c_tit2, c_tit3 = st.columns([2, 1, 1])
+        c_tit1.caption("**Artefacto**")
+        c_tit2.caption("**Watts**")
+        c_tit3.caption("**Horas/Día**")
 
+        for art in seleccionados:
+            # Obtener potencia fija del Excel
+            potencia_fija = int(df[df["Artefacto"] == art]["Potencia"].iloc[0])
+            
+            # FILA ÚNICA POR ARTEFACTO
+            col1, col2, col3 = st.columns([2, 1, 1])
+            
+            with col1:
+                st.write(f"**{art}**")
+            with col2:
+                # Se muestra el valor fijo, no es editable para evitar errores del cliente
+                st.write(f"{potencia_fija} W")
+            with col3:
+                # El cliente solo toca las horas
+                h = st.number_input(f"Horas {art}", min_value=0, max_value=24, step=1, label_visibility="collapsed")
+            
+            # Suma acumulada automática
+            total_wh_dia += (potencia_fija * h)
+
+        st.markdown("---")
+        # SUMA TOTAL VISIBLE ANTES DE ENVIAR
+        kwh_dia = total_wh_dia / 1000
+        st.subheader(f"📊 Consumo Total: {kwh_dia:.2f} kWh/día")
+    
     st.divider()
     
-    # RESULTADO
-    kwh_dia = total_wh_dia / 1000
-    st.metric("Demanda Estimada Total", f"{kwh_dia:.2f} kWh/día")
-    
-    # 3. CONTACTO
-    st.subheader("3. Datos de contacto")
+    st.subheader("3. Contacto")
     nombre = st.text_input("Nombre")
     telefono = st.text_input("WhatsApp")
 
-    enviar = st.form_submit_button("ENVIAR SOLICITUD A SESTRI ENERGÍA", use_container_width=True)
+    enviar = st.form_submit_button("ENVIAR MI SOLICITUD A SESTRI ENERGÍA", use_container_width=True)
 
 if enviar:
     if nombre and telefono:
-        st.success(f"¡Gracias {nombre}! Recibimos tu demanda de {kwh_dia:.2f} kWh/día.")
+        st.success(f"¡Gracias {nombre}! Recibimos tu relevamiento por {total_wh_dia / 1000:.2f} kWh/día.")
     else:
-        st.warning("Completá tus datos de contacto.")
+        st.warning("Por favor, completá nombre y WhatsApp.")
