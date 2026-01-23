@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# Configuración de página
+# Configuración de Sestri Energía
 st.set_page_config(page_title="Sestri Energía - Relevamiento", layout="centered")
 
 # --- BASE DE DATOS (Watts fijos del ENRE) ---
@@ -16,63 +16,63 @@ data_enre = {
 }
 df = pd.DataFrame(data_enre)
 
-# --- INTERFAZ ---
-st.title("⚡ Sestri Energía")
-st.subheader("Relevamiento de Equipamiento Eléctrico")
-st.write("Si los cortes de energia o su costo son un problema en tu hogar o empresa, te podemos ayudar. Ponete en contacto con unos pocos clics")
+# --- BLOQUE COMERCIAL DE INICIO ---
+st.title("⚡ ¿Problemas con cortes de energía?")
+st.subheader("Nosotros podemos ayudarte.")
+st.write("Dejanos saber tus necesidades enviándonos la info con unos simples clics.")
 
 st.markdown("---")
 
 # 1. SELECCIÓN DE ARTEFACTOS
-# El usuario solo elige de la lista, no carga horas ni watts.
 seleccionados = st.multiselect(
-    "Buscá y marcá tus equipos:",
+    "Buscá y marcá tus equipos de la lista:",
     options=df["Artefacto"].tolist(),
-    help="Podés seleccionar varios de la lista."
+    help="Podés seleccionar todos los que necesites."
 )
 
 st.divider()
 
 if seleccionados:
     total_watts = 0
+    st.write("**Resumen de equipos seleccionados:**")
     
-    # Mostramos un resumen de lo seleccionado con sus watts fijos
-    st.write("**Resumen de Potencia Instalada:**")
-    
+    # Listado simple para el cliente
     for art in seleccionados:
-        # Buscamos la potencia automáticamente
         p = int(df[df["Artefacto"] == art]["Potencia"].iloc[0])
         total_watts += p
-        # Formato simple: Nombre - Watts
-        st.write(f"✅ {art}: **{p} W**")
+        st.write(f"✅ {art} (**{p} W**)")
 
-    st.divider()
-    
-    # CÁLCULO FINAL EN kW
+    # Cálculo en kW
     total_kw = total_watts / 1000
     
-    col1, col2 = st.columns(2)
-    col1.metric("Potencia Total (W)", f"{total_watts} W")
-    col2.metric("Potencia Total (kW)", f"{total_kw:.2f} kW")
-    
-    st.info("Esta es la potencia máxima que el sistema debería soportar si todos los equipos encendieran a la vez.")
+    st.divider()
+    st.metric("Potencia Total Estimada", f"{total_kw:.2f} kW")
 
-    # 2. FORMULARIO DE CONTACTO
+    # 2. FORMULARIO DE CONTACTO Y BOTÓN WHATSAPP
     with st.form("contacto_sestri"):
         st.write("### Envianos tu consulta")
         nombre = st.text_input("Nombre y Apellido")
-        whatsapp = st.text_input("WhatsApp")
         
-        if st.form_submit_button("ENVIAR A SESTRI ENERGÍA", use_container_width=True):
-            if nombre and whatsapp:
-                st.success(f"¡Gracias {nombre}! Recibimos tu listado con un total de {total_kw:.2f} kW.")
+        # El botón del formulario procesa los datos
+        confirmar = st.form_submit_button("PREPARAR MENSAJE DE WHATSAPP", use_container_width=True)
+        
+        if confirmar:
+            if nombre and seleccionados:
+                # --- CONFIGURACIÓN DE WHATSAPP ---
+                # AQUÍ: Poné tu número (ej: 5491161234567) sin símbolos
+                tu_telefono = "5491161549018" 
+                
+                lista_txt = ", ".join(seleccionados)
+                mensaje_wa = f"Hola Sestri Energía! Mi nombre es {nombre}. Mi relevamiento dio un total de {total_kw:.2f} kW. Equipos: {lista_txt}."
+                
+                # Codificamos el mensaje para la URL
+                url_wa = f"https://wa.me/{tu_telefono}?text={mensaje_wa.replace(' ', '%20')}"
+                
+                st.success(f"¡Todo listo, {nombre}!")
+                # Botón final que abre WhatsApp
+                st.link_button("📲 ENVIAR AHORA POR WHATSAPP", url_wa, use_container_width=True)
             else:
-                st.warning("Por favor, completá tus datos de contacto.")
+                st.warning("Por favor, ingresá tu nombre antes de enviar.")
 
 else:
-    st.info("Elegí tus artefactos arriba para ver el total de potencia.")
-
-
-
-
-
+    st.info("Elegí tus artefactos arriba para calcular la potencia total.")
