@@ -19,7 +19,9 @@ df = pd.DataFrame(data_enre)
 # --- INTERFAZ ---
 st.title("⚡ Sestri Energía")
 st.subheader("Relevamiento de Equipamiento Eléctrico")
-st.write("Seleccioná los artefactos que tenés en tu hogar o empresa.")
+st.write("¿Problemas con los cortes de energía?, ¿El costo de la energía es muy alto?"
+        "La energía autogenerada es la solución". Con tan solo unos pocos clics te 
+         podemos ayudar")
 
 st.markdown("---")
 
@@ -71,3 +73,4 @@ if seleccionados:
 
 else:
     st.info("Elegí tus artefactos arriba para ver el total de potencia.")
+
