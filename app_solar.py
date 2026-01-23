@@ -1,12 +1,12 @@
 import streamlit as st
 
-# Configuración de página para Sestri Energía
+# Configuración de página centrada
 st.set_page_config(page_title="Sestri Energía - Relevamiento", layout="centered")
 
 # --- BLOQUE COMERCIAL DE INICIO ---
 st.title("⚡ ¿Problemas con cortes de energía?")
 st.subheader("Nosotros podemos ayudarte.")
-st.write("Dejanos saber tus necesidades enviándonos la información con un simple clic.")
+st.write("Dejanos saber tus necesidades enviándonos la info con un simple clic. **Somos Sestri Energía.**")
 
 # Espacio visual
 st.markdown("---")
@@ -51,11 +51,11 @@ with st.form("relevamiento_sestri"):
     nombre = st.text_input("Nombre y Apellido")
     telefono = st.text_input("WhatsApp")
 
-    # Botón con llamado a la acción claro
-    enviar = st.form_submit_button("ENVIAR MI SOLICITUD", use_container_width=True)
+    # Botón con llamado a la acción claro y ancho completo
+    enviar = st.form_submit_button("ENVIAR MI SOLICITUD A SESTRI ENERGÍA", use_container_width=True)
 
 if enviar:
     if nombre and telefono:
         st.success(f"¡Excelente {nombre}! Hemos recibido tu información para el sistema de {objetivo}. Un técnico de Sestri Energía te contactará pronto.")
     else:
-        st.warning("Por favor, completá al menos tu nombre y WhatsApp para que podamos contactarte.")
+        st.warning("Por favor, completá tu nombre y WhatsApp para que podamos asesorarte.")
