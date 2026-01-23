@@ -1,43 +1,61 @@
 import streamlit as st
 
-# Mantenemos el diseño centrado para que no se desborde en el móvil
-st.set_page_config(page_title="Relevamiento GST", layout="centered")
+# Configuración de página para Sestri Energía
+st.set_page_config(page_title="Sestri Energía - Relevamiento", layout="centered")
 
-st.title("☀️ Relevamiento de Consumos Críticos")
-st.write("Complete los equipos que desea mantener funcionando ante un corte o con energía solar.")
+# --- BLOQUE COMERCIAL DE INICIO ---
+st.title("⚡ ¿Problemas con cortes de energía?")
+st.subheader("Nosotros podemos ayudarte.")
+st.write("Dejanos saber tus necesidades enviándonos la información con un simple clic.")
 
-with st.form("relevamiento_tecnico"):
-    st.subheader("Equipos de Respaldo")
+# Espacio visual
+st.markdown("---")
+
+with st.form("relevamiento_sestri"):
+    # --- SECCIÓN 1: OBJETIVO ---
+    st.subheader("1. ¿Qué buscás resolver?")
+    objetivo = st.radio(
+        "Seleccioná tu prioridad:",
+        ["Back-Up (Respaldo ante cortes)", "Ahorrar Energía (Autoconsumo)", "Ambas opciones"],
+        index=0
+    )
     
-    # Lista de equipos comunes para que el cliente solo complete horas o Watts
-    # Usamos columnas que se apilan solas en el celular
+    st.divider()
+
+    # --- SECCIÓN 2: CONSUMOS CRÍTICOS ---
+    st.subheader("2. Consumos Críticos")
+    st.write("Marcá qué equipos necesitás mantener encendidos siempre:")
+    
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.write("**Dispositivo Crítico**")
+        st.write("**Dispositivo**")
         eq1 = st.checkbox("Heladera / Freezer")
         eq2 = st.checkbox("Iluminación (LED)")
         eq3 = st.checkbox("Bomba de Agua")
-        eq4 = st.checkbox("Internet / Cámaras")
-        otro_nombre = st.text_input("Otro equipo:")
+        eq4 = st.checkbox("Internet / Cámaras / Alarmas")
+        otro_nombre = st.text_input("Otro equipo específico:")
     
     with col2:
         st.write("**Uso (Horas/Día)**")
-        h1 = st.number_input("Horas Heladera", min_value=0, max_value=24, step=1, label_visibility="collapsed")
-        h2 = st.number_input("Horas Luces", min_value=0, max_value=24, step=1, label_visibility="collapsed")
-        h3 = st.number_input("Horas Bomba", min_value=0, max_value=24, step=1, label_visibility="collapsed")
-        h4 = st.number_input("Horas Internet", min_value=0, max_value=24, step=1, label_visibility="collapsed")
-        h5 = st.number_input("Horas Otro", min_value=0, max_value=24, step=1, label_visibility="collapsed")
+        h1 = st.number_input("H. Heladera", min_value=0, max_value=24, step=1, label_visibility="collapsed")
+        h2 = st.number_input("H. Luces", min_value=0, max_value=24, step=1, label_visibility="collapsed")
+        h3 = st.number_input("H. Bomba", min_value=0, max_value=24, step=1, label_visibility="collapsed")
+        h4 = st.number_input("H. Internet", min_value=0, max_value=24, step=1, label_visibility="collapsed")
+        h5 = st.number_input("H. Otro", min_value=0, max_value=24, step=1, label_visibility="collapsed")
 
     st.divider()
     
-    # Datos de contacto para que te llegue el informe
-    nombre = st.text_input("Tu Nombre")
-    telefono = st.text_input("WhatsApp de contacto")
+    # --- SECCIÓN 3: CONTACTO ---
+    st.subheader("3. Datos de contacto")
+    nombre = st.text_input("Nombre y Apellido")
+    telefono = st.text_input("WhatsApp")
 
-    # Botón de envío que ocupa todo el ancho del celular
-    enviar = st.form_submit_button("Enviar datos para configuración", use_container_width=True)
+    # Botón con llamado a la acción claro
+    enviar = st.form_submit_button("ENVIAR MI SOLICITUD", use_container_width=True)
 
 if enviar:
-    st.success(f"¡Gracias {nombre}! Recibimos tus datos. En breve configuraremos tu sistema a medida.")
-    # Aquí podrías agregar el botón de WhatsApp que ya teníamos para que te mande el resumen
+    if nombre and telefono:
+        st.success(f"¡Excelente {nombre}! Hemos recibido tu información para el sistema de {objetivo}. Un técnico de Sestri Energía te contactará pronto.")
+    else:
+        st.warning("Por favor, completá al menos tu nombre y WhatsApp para que podamos contactarte.")
