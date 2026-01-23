@@ -1,4 +1,4 @@
-import streamlit as st
+mport streamlit as st
 import pandas as pd
 
 # Configuración de página
@@ -86,3 +86,4 @@ if enviar:
         st.success(f"¡Excelente {nombre}! Hemos recibido tu relevamiento por {total_energia_dia / 1000:.2f} kWh/día.")
     else:
         st.warning("Por favor, completá tu nombre y contacto para que podamos asesorarte.")
+
