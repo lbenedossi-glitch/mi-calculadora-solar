@@ -1,12 +1,14 @@
 import streamlit as st
 import pandas as pd
 
+# Configuración de página
 st.set_page_config(page_title="Sestri Energía - Relevamiento", layout="centered")
 
-# --- DATOS DEL ENRE ---
+# --- BASE DE DATOS INTERNA (Misma de tu Excel) ---
+# Separamos Artefacto de Potencia para que la matemática funcione
 data_enre = {
     "Artefacto": [
-        "Aire acondicionado 2200 frig", "Aire acondicionado 3500 frig", 
+        "Aire acondicionado 2200 frigorías", "Aire acondicionado 3500 frigorías", 
         "Bomba de agua 1/2 HP", "Bomba de agua 1 HP", "Heladera con freezer", 
         "Lavarropas automático", "Microondas", "Televisor LED 32-50''", 
         "Pava eléctrica", "Ventilador de techo", "Iluminación LED (Kit 10u)"
@@ -15,69 +17,72 @@ data_enre = {
 }
 df = pd.DataFrame(data_enre)
 
-# --- INICIO ---
+# --- ENCABEZADO ---
 st.title("⚡ Sestri Energía")
-st.subheader("Calculadora de Consumos Críticos")
-st.write("Seleccioná tus equipos y definí las horas de uso.")
+st.subheader("Calculadora de Relevamiento Fotovoltaico")
+st.write("Seleccioná los equipos para calcular tu demanda diaria en kWh.")
 
 st.markdown("---")
 
-with st.form("relevamiento_sestri"):
+with st.form("formulario_sestri"):
     # 1. OBJETIVO
-    objetivo = st.radio("Prioridad:", ["Back-Up", "Ahorro", "Ambas"], horizontal=True)
+    objetivo = st.radio("Prioridad del sistema:", ["Back-Up", "Ahorro", "Ambas"], horizontal=True)
     
     st.divider()
 
-    # 2. SELECCIÓN DE ARTEFACTOS
+    # 2. SELECCIÓN DINÁMICA
+    st.write("**Buscá y agregá tus artefactos de la lista:**")
     seleccionados = st.multiselect(
-        "Buscá y agregá tus artefactos:",
-        options=df["Artefacto"].tolist()
+        "Hacé clic aquí para buscar:",
+        options=df["Artefacto"].tolist(),
+        help="Podés escribir el nombre del aparato para encontrarlo rápido."
     )
     
-    total_wh_dia = 0
+    total_energia_dia = 0
     
     if seleccionados:
         st.write("---")
-        # Encabezados
+        # Encabezados de tabla
         col_t1, col_t2, col_t3 = st.columns([2, 1, 1])
         col_t1.caption("**Artefacto**")
-        col_t2.caption("**Watts**")
-        col_t3.caption("**Horas/Día**")
+        col_t2.caption("**Watts (ENRE)**")
+        col_t3.caption("**Horas de uso**")
 
         for art in seleccionados:
-            # Traemos la potencia fija del "Excel" (DataFrame)
-            potencia_fija = int(df[df["Artefacto"] == art]["Potencia"].iloc[0])
+            # Extraemos el valor numérico de la potencia de forma limpia
+            valor_watts = int(df[df["Artefacto"] == art]["Potencia"].iloc[0])
             
-            # FILA ÚNICA
+            # Mostramos la fila alineada
             c1, c2, c3 = st.columns([2, 1, 1])
             
             with c1:
-                st.write(f"{art}")
+                st.write(art)
             with c2:
-                # AQUÍ ESTÁ LA CLAVE: st.write NO requiere carga manual
-                st.write(f"**{potencia_fija} W**")
+                # Se muestra como texto, NO como input. El cliente no lo carga.
+                st.write(f"{valor_watts} W")
             with c3:
-                # El único cuadro de carga es este
-                h = st.number_input(f"h_{art}", min_value=0, max_value=24, step=1, label_visibility="collapsed")
+                # Único dato que el cliente ingresa manualmente
+                h = st.number_input(f"Horas para {art}", min_value=0, max_value=24, step=1, label_visibility="collapsed")
             
-            # Calculamos energía
-            total_wh_dia += (potencia_fija * h)
+            # MATEMÁTICA: Aquí se hace el cálculo real
+            total_energia_dia += (valor_watts * h)
 
         st.markdown("---")
-        # SUMATORIA TOTAL
-        kwh_dia = total_wh_dia / 1000
-        st.metric("Total Acumulado", f"{kwh_dia:.2f} kWh/día")
+        # RESULTADO FINAL VISIBLE
+        kwh_final = total_energia_dia / 1000
+        st.metric("DEMANDA TOTAL ESTIMADA", f"{kwh_final:.2f} kWh/día")
+        st.caption("Este valor es fundamental para dimensionar tus paneles y baterías.")
     
     st.divider()
     
     # 3. CONTACTO
-    nombre = st.text_input("Nombre")
-    telefono = st.text_input("WhatsApp")
+    nombre = st.text_input("Tu Nombre")
+    whatsapp = st.text_input("Tu WhatsApp")
 
-    enviar = st.form_submit_button("ENVIAR A SESTRI ENERGÍA", use_container_width=True)
+    enviar = st.form_submit_button("ENVIAR RELEVAMIENTO A SESTRI ENERGÍA", use_container_width=True)
 
 if enviar:
-    if nombre and telefono:
-        st.success(f"¡Gracias {nombre}! Recibimos tu demanda de {total_wh_dia / 1000:.2f} kWh/día.")
+    if nombre and whatsapp:
+        st.success(f"¡Excelente {nombre}! Hemos recibido tu relevamiento por {total_energia_dia / 1000:.2f} kWh/día.")
     else:
-        st.warning("Completá tus datos de contacto.")
+        st.warning("Por favor, completá tu nombre y contacto para que podamos asesorarte.")
