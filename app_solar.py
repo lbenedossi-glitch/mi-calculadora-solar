@@ -18,7 +18,7 @@ df = pd.DataFrame(data_enre)
 
 # --- BLOQUE COMERCIAL DE INICIO ---
 st.title("⚡ SESTRI ENERGÍA")
-st.subheader("Generar tu propia energía es la solución. Nosotros podemos ayudarte.")
+st.subheader("¿Cortes frecuentes o alto costo? Generar tu propia energía es la solución. Nosotros podemos ayudarte.")
 st.write("Dejanos saber tus necesidades enviándonos la info con unos simples clics.")
 
 st.markdown("---")
@@ -54,7 +54,7 @@ if seleccionados:
             if nombre and tel_cliente and seleccionados:
                 # --- CONFIGURACIÓN DE TU WHATSAPP ---
                 # PONÉ TU NÚMERO AQUÍ (Ej: 54911XXXXXXXX)
-                tu_telefono = "5491100000000" 
+                tu_telefono = "5491161549018" 
                 
                 lista_txt = ", ".join(seleccionados)
                 # El mensaje ahora incluye el teléfono para que te quede registrado en el texto
@@ -74,3 +74,4 @@ if seleccionados:
 
 else:
     st.info("Elegí tus artefactos arriba para calcular la potencia total.")
+
