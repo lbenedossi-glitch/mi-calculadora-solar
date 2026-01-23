@@ -16,22 +16,31 @@ data_enre = {
 }
 df = pd.DataFrame(data_enre)
 
-# --- BLOQUE COMERCIAL DE INICIO ---
-st.title("⚡ SESTRI ENERGÍA")
-st.subheader("¿Cortes frecuentes o alto costo? Generar tu propia energía es la solución. Nosotros podemos ayudarte.")
-st.write("Dejanos saber tus necesidades enviándonos la info con unos simples clics.")
+# --- TU NUEVO ENCABEZADO PERSONALIZADO ---
+st.title("⚡ Sestri Energía")
+st.subheader("¿Problemas con los cortes o el costo? Generar tu propia energía es la solución. Te podemos ayudar.")
+st.write("Dejanos conocer tus necesidades con unos simples clics.")
 
 st.markdown("---")
 
-# 1. SELECCIÓN DE ARTEFACTOS
+# 1. OPCIÓN DE OBJETIVO
+objetivo = st.radio(
+    "¿Qué buscás resolver principalmente?",
+    ["Back-Up (Respaldo ante cortes)", "Ahorrar energía (Autoconsumo)", "Ambas opciones"],
+    horizontal=False
+)
+
+st.divider()
+
+# 2. SELECCIÓN DE ARTEFACTOS
 seleccionados = st.multiselect(
-    "Buscá y marcá tus equipos de la lista:",
+    "Seleccioná los equipos que querés incluir en tu sistema:",
     options=df["Artefacto"].tolist()
 )
 
 if seleccionados:
     total_watts = 0
-    st.write("**Equipos seleccionados:**")
+    st.write("**Resumen de equipos:**")
     
     for art in seleccionados:
         p = int(df[df["Artefacto"] == art]["Potencia"].iloc[0])
@@ -40,38 +49,19 @@ if seleccionados:
 
     total_kw = total_watts / 1000
     st.divider()
-    st.metric("Potencia Total Estimada", f"{total_kw:.2f} kW")
+    st.metric("Potencia Total Instalada", f"{total_kw:.2f} kW")
 
-    # 2. FORMULARIO DE CONTACTO E IDENTIFICACIÓN
+    # 3. FORMULARIO DE CONTACTO E IDENTIFICACIÓN
     with st.form("contacto_sestri"):
-        st.write("### Datos de contacto")
+        st.write("### Datos para tu presupuesto")
         nombre = st.text_input("Nombre y Apellido")
-        tel_cliente = st.text_input("WhatsApp de contacto (con código de área)")
+        tel_cliente = st.text_input("Tu WhatsApp (con código de área)")
         
         confirmar = st.form_submit_button("PREPARAR ENVÍO", use_container_width=True)
         
         if confirmar:
-            if nombre and tel_cliente and seleccionados:
-                # --- CONFIGURACIÓN DE TU WHATSAPP ---
-                # PONÉ TU NÚMERO AQUÍ (Ej: 54911XXXXXXXX)
-                tu_telefono = "5491161549018" 
+            if nombre and tel_cliente:
+                # --- TU NÚMERO DE WHATSAPP ---
+                tu_telefono = "5491161549018" # <--- CAMBIAR POR EL TUYO
                 
                 lista_txt = ", ".join(seleccionados)
-                # El mensaje ahora incluye el teléfono para que te quede registrado en el texto
-                mensaje_wa = (
-                    f"Hola Sestri Energía! Mi nombre es {nombre}. "
-                    f"Mi WhatsApp de contacto es {tel_cliente}. "
-                    f"Mi relevamiento dio un total de {total_kw:.2f} kW. "
-                    f"Equipos: {lista_txt}."
-                )
-                
-                url_wa = f"https://wa.me/{tu_telefono}?text={mensaje_wa.replace(' ', '%20')}"
-                
-                st.success(f"¡Gracias {nombre}! Para enviarnos la información, hacé clic en el botón de abajo.")
-                st.link_button("📲 ENVIAR RELEVAMIENTO A WHATSAPP", url_wa, use_container_width=True)
-            else:
-                st.warning("Por favor, completá tu nombre y teléfono para poder identificarte.")
-
-else:
-    st.info("Elegí tus artefactos arriba para calcular la potencia total.")
-
