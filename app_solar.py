@@ -19,7 +19,7 @@ df = pd.DataFrame(data_enre)
 # --- INTERFAZ ---
 st.title("⚡ Sestri Energía")
 st.subheader("Relevamiento de Equipamiento Eléctrico")
-st.write("Si el suministro eléctrico o el costo son un problema te podemos ayudar")
+st.write("Si el suministro eléctrico o su costo son un problema te podemos ayudar. Ponete en contacto con unos pocos clics")
 
 st.markdown("---")
 
@@ -71,5 +71,6 @@ if seleccionados:
 
 else:
     st.info("Elegí tus artefactos arriba para ver el total de potencia.")
+
 
 
