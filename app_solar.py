@@ -17,9 +17,9 @@ data_enre = {
 df = pd.DataFrame(data_enre)
 
 # --- BLOQUE COMERCIAL DE INICIO ---
-st.title("⚡ SESTRI ENERGIA")
-st.subheader("Si los cortes de luz o el costo de la factura son un problema. Nosotros podemos ayudarte.")
-st.write("Dejanos saber tus necesidades enviándonos la info con un simple clic. **Somos Sestri Energía.**")
+st.title("⚡ SESTRI ENERGÍA")
+st.subheader("Generar tu propia energía es la solución. Nosotros podemos ayudarte.")
+st.write("Dejanos saber tus necesidades enviándonos la info con unos simples clics.")
 
 st.markdown("---")
 
