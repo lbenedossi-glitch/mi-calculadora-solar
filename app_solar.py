@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # 1. Configuración de página
-st.set_page_config(page_title="Sestri Energía - Relevamiento", layout="centered")
+st.set_page_config(page_title="Sestri Energía - Relevamiento", layout="wide")
 
 # 2. CARGA DE DATOS
 @st.cache_data
@@ -11,7 +11,6 @@ def cargar_datos_excel():
     try:
         df_excel = pd.read_excel(nombre_archivo, engine='openpyxl')
         df_excel.columns = df_excel.columns.str.strip()
-        # Aseguramos que las dos primeras columnas sean nuestras etiquetas
         df_excel.rename(columns={df_excel.columns[0]: 'Artefacto', df_excel.columns[1]: 'Potencia'}, inplace=True)
         return df_excel
     except Exception as e:
@@ -20,70 +19,87 @@ def cargar_datos_excel():
 
 df = cargar_datos_excel()
 
-# --- INTERFAZ ---
+# --- ESTILO VISUAL ---
+st.markdown("""
+    <style>
+    .stNumberInput {width: 80px !important;}
+    .main {background-color: #f5f7f9;}
+    </style>
+    """, unsafe_allow_html=True)
+
 st.title("⚡ Sestri Energía")
 st.subheader("Calculadora de Relevamiento Fotovoltaico")
 
 if df is not None:
-    st.markdown("---")
-    objetivo = st.radio("¿Qué buscás con la energía solar?", ["Ahorro en la factura", "Respaldo ante cortes (Back-up)", "Ambas"])
+    st.info("Paso 1: Definí tu objetivo y elegí tus equipos")
     
-    # Selección múltiple de equipos desde el Excel
-    seleccionados = st.multiselect(
-        "Seleccioná los equipos que querés alimentar:", 
-        options=df["Artefacto"].unique().tolist()
-    )
+    col_a, col_b = st.columns(2)
+    with col_a:
+        objetivo = st.selectbox("¿Qué buscás resolver?", ["Ahorro", "Back-up (Cortes)", "Ambas"])
+    with col_b:
+        seleccionados = st.multiselect(
+            "Elegí tus equipos de la lista:", 
+            options=df["Artefacto"].unique().tolist()
+        )
 
     total_watts = 0
     resumen_mensaje = []
 
     if seleccionados:
-        st.write("### Cantidades y Consumos:")
+        st.markdown("---")
+        st.markdown("#### Paso 2: Ajustá cantidades")
         
-        # Iteramos sobre lo seleccionado para pedir cantidades
+        # Encabezados de tabla simples
+        h1, h2, h3 = st.columns([3, 1, 1])
+        h1.caption("**Artefacto**")
+        h2.caption("**Cant.**")
+        h3.caption("**Subtotal**")
+
         for art in seleccionados:
-            # Buscamos la potencia unitaria en el DataFrame
             p_unitaria = int(df[df["Artefacto"] == art]["Potencia"].iloc[0])
             
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                cant = st.number_input(f"¿Cuántos: {art}?", min_value=1, value=1, key=f"cant_{art}")
+            c1, c2, c3 = st.columns([3, 1, 1])
+            with c1:
+                st.write(f"🔹 {art}")
+            with c2:
+                # Usamos label_visibility="collapsed" para que no ocupe espacio el texto "¿Cuántos?"
+                cant = st.number_input("", min_value=1, value=1, key=f"c_{art}", label_visibility="collapsed")
             
             subtotal = p_unitaria * cant
             total_watts += subtotal
             resumen_mensaje.append(f"{cant}x {art}")
             
-            with col2:
-                st.write(f"Subtotal: \n**{subtotal} W**")
+            with c3:
+                st.write(f"**{subtotal} W**")
 
         # --- RESULTADOS ---
         total_kw = total_watts / 1000
         st.divider()
-        st.metric("POTENCIA TOTAL CALCULADA", f"{total_kw:.2f} kW")
+        
+        # Usamos una métrica grande para el total
+        st.metric("POTENCIA TOTAL RELEVADA", f"{total_kw:.2f} kW")
 
-        # --- FORMULARIO DE ENVÍO ---
+        # --- PASO FINAL ---
+        st.markdown("#### Paso 3: Envíanos tu consulta")
         with st.form("envio_sestri"):
-            nombre = st.text_input("Tu Nombre")
-            ciudad = st.text_input("Localidad / Provincia")
+            c_nom, c_loc = st.columns(2)
+            nombre = c_nom.text_input("Nombre y Apellido")
+            ciudad = c_loc.text_input("Localidad")
             
-            enviar = st.form_submit_button("PREPARAR RELEVAMIENTO PARA WHATSAPP", use_container_width=True)
+            enviar = st.form_submit_button("PREPARAR WHATSAPP PARA SESTRI ENERGÍA", use_container_width=True)
             
             if enviar:
                 if nombre:
-                    # REEMPLAZA ESTE NÚMERO POR TU WHATSAPP REAL (con código de país)
-                    tu_telefono = "5491100000000" 
+                    tu_telefono = "5491136453664" # Tu número de Sestri Energía
+                    texto_ws = (f"Sestri Energía: Relevamiento de {nombre} ({ciudad}). "
+                                f"Objetivo: {objetivo}. Total: {total_kw:.2f}kW. "
+                                f"Detalle: {', '.join(resumen_mensaje)}.")
                     
-                    texto_ws = (f"Hola Sestri Energía, soy {nombre} de {ciudad}. "
-                                f"Hice mi relevamiento: Objetivo: {objetivo}. "
-                                f"Total: {total_kw:.2f}kW. Equipos: {', '.join(resumen_mensaje)}.")
-                    
-                    # Formatear link de WhatsApp
                     link = f"https://wa.me/{tu_telefono}?text={texto_ws.replace(' ', '%20')}"
-                    
-                    st.success("¡Todo listo! Hacé clic abajo para enviármelo.")
-                    st.link_button("📲 ENVIAR POR WHATSAPP AHORA", link, use_container_width=True)
+                    st.success("✅ ¡Presupuesto calculado! Hacé clic en el botón de abajo.")
+                    st.link_button("📲 ENVIAR AHORA POR WHATSAPP", link, use_container_width=True)
                 else:
-                    st.warning("Por favor, poné tu nombre para que sepa quién sos.")
-
+                    st.warning("Completá tu nombre para continuar.")
 else:
-    st.warning("Esperando conexión con el archivo Excel...")
+    st.warning("Verificando conexión con los datos de Sestri Energía...")
+
