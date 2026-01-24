@@ -102,4 +102,3 @@ if df is not None:
                     st.warning("Completá tu nombre para continuar.")
 else:
     st.warning("Verificando conexión con los datos de Sestri Energía...")
-
