@@ -1,86 +1,52 @@
 import streamlit as st
 import pandas as pd
 
-# 1. Configuración de página
 st.set_page_config(page_title="Sestri Energía - Relevamiento", layout="centered")
 
-# 2. CARGA DE DATOS DESDE TU EXCEL SUBIDO
 @st.cache_data
 def cargar_datos_excel():
+    # Asegúrate de que el nombre sea IDÉNTICO al de GitHub
+    nombre_archivo = 'relevamiento_enre.xlsx'
     try:
-        # AQUÍ: Poné el nombre exacto de tu archivo en GitHub
-        nombre_archivo = 'relevamiento_enre.xlsx' 
-        df_excel = pd.read_excel(nombre_archivo)
+        # Leemos la primera hoja del Excel (sheet_name=0)
+        df_excel = pd.read_excel(nombre_archivo, engine='openpyxl', sheet_name=0)
         
-        # Limpiamos nombres de columnas
+        # Limpiamos nombres de columnas y sacamos filas vacías
         df_excel.columns = df_excel.columns.str.strip()
+        df_excel = df_excel.dropna(subset=[df_excel.columns[0]])
+        
+        # Renombramos las dos primeras columnas para que el código funcione siempre
+        df_excel.rename(columns={df_excel.columns[0]: 'Artefacto', df_excel.columns[1]: 'Potencia'}, inplace=True)
+        
+        # Convertimos Potencia a número por si hay errores en el Excel
+        df_excel['Potencia'] = pd.to_numeric(df_excel['Potencia'], errors='coerce')
+        df_excel = df_excel.dropna(subset=['Potencia'])
+        
         return df_excel
     except Exception as e:
-        st.error(f"Error al leer el Excel: {e}")
+        # Esto nos dirá en pantalla el error exacto si falla
+        st.error(f"Error detectado: {e}")
         return None
 
 df = cargar_datos_excel()
 
-# --- INTERFAZ ---
 st.title("⚡ Sestri Energía")
-st.subheader("Generar tu propia energía es la solución. Te podemos ayudar.")
+st.subheader("Relevamiento de Consumo Eléctrico")
 
 if df is not None:
-    st.markdown("---")
-    objetivo = st.radio("¿Qué buscás resolver?", ["Back-Up (Cortes)", "Ahorro", "Ambas"])
-    st.divider()
-
-    # Selección múltiple basada en el EXCEL
+    st.success("✅ Lista de equipos cargada correctamente")
+    
     seleccionados = st.multiselect(
-        "Seleccioná tus equipos (datos cargados desde tu Excel):", 
+        "Buscá y seleccioná tus artefactos:",
         options=df["Artefacto"].unique().tolist()
     )
-
-    total_watts = 0
-    equipos_resumen = []
-
-    if seleccionados:
-        st.write("### Ajustá las cantidades:")
-        col_h1, col_h2, col_h3 = st.columns([2, 1, 1])
-        col_h1.caption("**Equipo**")
-        col_h2.caption("**Cant.**")
-        col_h3.caption("**Subtotal**")
-
-        for art in seleccionados:
-            # Buscamos la potencia en el Excel
-            p_unitaria = int(df[df["Artefacto"] == art]["Potencia"].iloc[0])
-            
-            c1, c2, c3 = st.columns([2, 1, 1])
-            with c1:
-                st.write(art)
-            with c2:
-                # El "key" asegura que cada selector sea único
-                cant = st.number_input(f"Cant_{art}", min_value=1, max_value=100, value=1, label_visibility="collapsed", key=f"input_{art}")
-            
-            subtotal = p_unitaria * cant
-            total_watts += subtotal
-            equipos_resumen.append(f"{cant}x {art} ({subtotal}W)")
-            
-            with c3:
-                st.write(f"**{subtotal} W**")
-
-        # --- CÁLCULO Y ENVÍO ---
-        total_kw = total_watts / 1000
-        st.divider()
-        st.metric("POTENCIA TOTAL RELEVADA", f"{total_kw:.2f} kW")
-
-        with st.form("contacto"):
-            nombre = st.text_input("Nombre y Apellido")
-            tel = st.text_input("WhatsApp de contacto")
-            
-            if st.form_submit_button("PREPARAR ENVÍO A SESTRI ENERGÍA", use_container_width=True):
-                if nombre and tel:
-                    # RECUERDA: Poné tu número real aquí
-                    tu_num = "5491161549018" 
-                    msg = f"Sestri Energía: Relevamiento de {nombre} ({tel}). Objetivo: {objetivo}. Total: {total_kw:.2f}kW. Detalle: {', '.join(equipos_resumen)}."
-                    url = f"https://wa.me/{tu_num}?text={msg.replace(' ', '%20')}"
-                    st.link_button("📲 ENVIAR POR WHATSAPP", url, use_container_width=True)
-                else:
-                    st.warning("Por favor, completá tus datos.")
+    
+    # ... (el resto del proceso de cantidades y WhatsApp que ya teníamos)
 else:
-    st.info("Asegurate de que el archivo Excel esté en el repositorio de GitHub y que el nombre en el código coincida.")
+    st.warning(f"⚠️ No pudimos leer el archivo. Revisá que el archivo en GitHub se llame exactamente 'relevamiento_enre.xlsx'")
+¿Qué hacer ahora?
+Actualizá el código con este nuevo bloque.
+
+Si sigue saliendo el cartel rojo, intentá leer las primeras palabras (por ejemplo: FileNotFoundError o ValueError).
+
+¿Lograste ver qué dice el error en los Logs o en el cartel rojo ahora con este nuevo código? Si me pasás el nombre del error, lo arreglamos en un minuto.
