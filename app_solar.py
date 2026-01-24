@@ -44,9 +44,10 @@ if df is not None:
     # ... (el resto del proceso de cantidades y WhatsApp que ya teníamos)
 else:
     st.warning(f"⚠️ No pudimos leer el archivo. Revisá que el archivo en GitHub se llame exactamente 'relevamiento_enre.xlsx'")
-¿Qué hacer ahora?
+#¿Qué hacer ahora?
 Actualizá el código con este nuevo bloque.
 
 Si sigue saliendo el cartel rojo, intentá leer las primeras palabras (por ejemplo: FileNotFoundError o ValueError).
 
 ¿Lograste ver qué dice el error en los Logs o en el cartel rojo ahora con este nuevo código? Si me pasás el nombre del error, lo arreglamos en un minuto.
+
