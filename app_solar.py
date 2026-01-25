@@ -90,7 +90,7 @@ if df is not None:
             
             if enviar:
                 if nombre:
-                    tu_telefono = "5491136453664" # Tu número de Sestri Energía
+                    tu_telefono = "5491161549018" # Tu número de Sestri Energía
                     texto_ws = (f"Sestri Energía: Relevamiento de {nombre} ({ciudad}). "
                                 f"Objetivo: {objetivo}. Total: {total_kw:.2f}kW. "
                                 f"Detalle: {', '.join(resumen_mensaje)}.")
@@ -102,3 +102,4 @@ if df is not None:
                     st.warning("Completá tu nombre para continuar.")
 else:
     st.warning("Verificando conexión con los datos de Sestri Energía...")
+
