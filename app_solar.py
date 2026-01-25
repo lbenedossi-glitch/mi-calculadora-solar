@@ -84,13 +84,13 @@ if df is not None:
         with st.form("envio_sestri"):
             c_nom, c_loc = st.columns(2)
             nombre = c_nom.text_input("Nombre y Apellido")
-            ciudad = c_loc.text_input("tu whatsapp")
+            ciudad = c_loc.text_input("Localidad")
             
             enviar = st.form_submit_button("PREPARAR WHATSAPP PARA SESTRI ENERGÍA", use_container_width=True)
             
             if enviar:
                 if nombre:
-                    tu_telefono = "5491161549018" # Tu número de Sestri Energía
+                    tu_telefono = "5491136453664" # Tu número de Sestri Energía
                     texto_ws = (f"Sestri Energía: Relevamiento de {nombre} ({ciudad}). "
                                 f"Objetivo: {objetivo}. Total: {total_kw:.2f}kW. "
                                 f"Detalle: {', '.join(resumen_mensaje)}.")
@@ -102,4 +102,3 @@ if df is not None:
                     st.warning("Completá tu nombre para continuar.")
 else:
     st.warning("Verificando conexión con los datos de Sestri Energía...")
-
