@@ -82,7 +82,7 @@ if df is not None:
             
             if enviar:
                 if nombre:
-                    tu_telefono = "5491136453664" 
+                    tu_telefono = "5491161549018" 
                     texto_ws = (f"Sestri Energía: Relevamiento de {nombre} (WhatsApp: {whatsapp_cliente}). "
                                 f"Objetivo: {objetivo}. Total: {total_kw:.2f}kW. "
                                 f"Detalle: {', '.join(resumen_mensaje)}.")
@@ -93,4 +93,5 @@ if df is not None:
                 else:
                     st.warning("Completá tu nombre para continuar.")
 else:
+
     st.warning("Verificando conexión con el archivo Excel...")
