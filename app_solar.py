@@ -75,7 +75,7 @@ if df is not None:
         st.markdown("#### Paso 3: Envíanos tu consulta")
         with st.form("envio_sestri"):
             c_nom, c_tel = st.columns(2)
-            nombre = c_nom.text_input("Nombre y Apellido")
+            nombre = c_nom.text_input("Nombre")
             whatsapp_cliente = c_tel.text_input("Tu WhatsApp")
             
             enviar = st.form_submit_button("PREPARAR WHATSAPP PARA SESTRI ENERGÍA", use_container_width=True)
@@ -95,3 +95,4 @@ if df is not None:
 else:
 
     st.warning("Verificando conexión con el archivo Excel...")
+
