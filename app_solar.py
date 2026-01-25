@@ -25,7 +25,7 @@ st.title("⚡ Sestri Energía")
 # REINTEGRAMOS EL GANCHO COMERCIAL AQUÍ
 st.subheader("¿Problemas con los cortes de luz o el costo de las facturas?")
 st.markdown("#### **Generar tu propia energía es la solución.**")
-st.write("Contactanos con unos pocos clics realizando este breve relevamiento.")
+st.write("Contactanos con unos pocos clikcs realizando este breve relevamiento.")
 st.divider()
 
 if df is not None:
@@ -95,4 +95,5 @@ if df is not None:
 else:
 
     st.warning("Verificando conexión con el archivo Excel...")
+
 
